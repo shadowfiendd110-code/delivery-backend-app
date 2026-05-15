@@ -1,0 +1,75 @@
+/**
+ * Модуль для взаимодействия с backend API заказов на доставку.
+ * Использует axios для выполнения HTTP-запросов.
+ */
+
+import axios from 'axios';
+
+// Для работы в Docker (бэкенд доступен по адресу http://localhost:8080)
+const API_BASE_URL = 'http://localhost:8080/api';
+
+/**
+ * Настроенный экземпляр axios с базовым URL и заголовками.
+ */
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+/**
+ * Получает список всех заказов из API.
+ * @async
+ * @returns {Promise<Array>} Массив объектов заказов.
+ * @throws {Error} Если запрос не удался.
+ */
+export const getAllOrders = async () => {
+  try {
+    const response = await api.get('/orders');
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при получении заказов:', error);
+    throw error;
+  }
+};
+
+/**
+ * Получает заказ по его ID.
+ * @async
+ * @param {number} id - Идентификатор заказа.
+ * @returns {Promise<Object>} Объект заказа.
+ * @throws {Error} Если запрос не удался или заказ не найден.
+ */
+export const getOrderById = async (id) => {
+  try {
+    const response = await api.get(`/orders/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Ошибка при получении заказа ${id}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Создаёт новый заказ.
+ * @async
+ * @param {Object} orderData - Данные заказа.
+ * @param {string} orderData.senderCity - Город отправителя.
+ * @param {string} orderData.senderAddress - Адрес отправителя.
+ * @param {string} orderData.recipientCity - Город получателя.
+ * @param {string} orderData.recipientAddress - Адрес получателя.
+ * @param {number} orderData.weight - Вес груза в кг.
+ * @param {string} orderData.pickupDate - Дата забора (YYYY-MM-DD).
+ * @returns {Promise<Object>} Созданный объект заказа.
+ * @throws {Error} Если запрос не удался.
+ */
+export const createOrder = async (orderData) => {
+  try {
+    const response = await api.post('/orders', orderData);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при создании заказа:', error);
+    throw error;
+  }
+};
